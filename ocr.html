@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+	<script
+	  src="https://code.jquery.com/jquery-3.2.1.min.js"
+	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	  crossorigin="anonymous"></script>
+	<script
+	  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+	  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+	  crossorigin="anonymous"></script>
+	<script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script>
+</head>
+
+<style>
+  video, canvas {
+    margin-left: 230px;
+    margin-top: 120px;
+    position: absolute;
+  }
+</style>
+<body>
+	<video id="video" width="250" height="250" preload autoplay loop muted></video>
+  	<canvas id="canvas" width="250" height="250"></canvas>
+  	<img src="">
+  	<script>
+
+		var video = document.querySelector('video');
+		var canvas = document.querySelector('canvas');
+		var ctx = canvas.getContext('2d');
+		var localMediaStream = null;
+
+		function errorCallback(e) {
+			console.log(e);
+		}
+
+		function snapshot() {
+			if (localMediaStream) {
+			  ctx.drawImage(video, 0, 0);
+			  // "image/webp" works in Chrome.
+			  // Other browsers will fall back to image/png.
+			  document.querySelector('img').src = canvas.toDataURL('image/webp');
+			  Tesseract.recognize(canvas.toDataURL('image/webp'))
+				.then(function(result){
+				    console.log(result);
+				});
+			}
+		}
+
+		video.addEventListener('click', snapshot, false);
+
+		// Not showing vendor prefixes or code that works cross-browser.
+		navigator.getUserMedia({video: true}, function(stream) {
+		video.src = window.URL.createObjectURL(stream);
+		localMediaStream = stream;
+		}, errorCallback);
+
+	</script>
+</body>
+</html>
